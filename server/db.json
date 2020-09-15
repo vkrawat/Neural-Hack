@@ -1,0 +1,129 @@
+{
+  "rules": [
+    {
+      "id": 1,
+      "category": "Retail Banking",
+      "ruleName": "Number of ATM Withdrawals from parent bank machine",
+      "conditions": "More than 20 in a month",
+      "fees": "2%",
+      "code": "001"
+    },
+    {
+      "id": 2,
+      "category": "Retail Banking",
+      "ruleName": "Monthly Charges Saving",
+      "conditions": "Monthly",
+      "fees": "25 RS",
+      "code": "002"
+    },
+    {
+      "id": 3,
+      "category": "Corp Banking",
+      "ruleName": "Monthly Charges Saving",
+      "conditions": "Bit Monthly",
+      "fees": "5% of Monthly Average",
+      "code": "003"
+    },
+    {
+      "id": 4,
+      "category": "Retail Banking",
+      "ruleName": "Statement Print Copy",
+      "conditions": "On Demand",
+      "fees": "50 Rs",
+      "code": "004"
+    },
+    {
+      "id": 5,
+      "category": "Retail Banking",
+      "ruleName": "Duplicate Debit Card ",
+      "conditions": "On Demand",
+      "fees": "150 Rs",
+      "code": "005"
+    },
+    {
+      "id": 6,
+      "category": "Retail Banking",
+      "ruleName": "Duplicate Debit Card",
+      "conditions": "On Demand",
+      "fees": "450 Rs",
+      "code": "006"
+    },
+    {
+      "id": 7,
+      "category": "Retail Banking",
+      "ruleName": "Number of ATM Withdrawals from another bank maching",
+      "conditions": "More than 5 in a month",
+      "fees": "10%",
+      "code": "007"
+    },
+    {
+      "id": 8,
+      "category": "All",
+      "ruleName": "Funds Transfer",
+      "conditions": "<10 in a Month",
+      "fees": "No Cost",
+      "code": "008"
+    },
+    {
+      "id": 9,
+      "category": "All",
+      "ruleName": "Funds Transfer",
+      "conditions": "11 to 30 in a Month",
+      "fees": "100 Rs",
+      "code": "009"
+    },
+    {
+      "id": 10,
+      "category": "All",
+      "ruleName": "Funds Transfer",
+      "conditions": "31 to 50 in a month",
+      "fees": "150 Rs",
+      "code": "010"
+    },
+    {
+      "id": 11,
+      "category": "All",
+      "ruleName": "Funds Transfer",
+      "conditions": "More than 51",
+      "fees": "300 Flat",
+      "code": "011"
+    },
+    {
+      "category": "134`2",
+      "ruleName": "rqwtqq",
+      "conditions": "2rq``",
+      "fees": "rwqqwt`",
+      "code": "wrrqwt",
+      "id": 12
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "abc",
+      "email": "abc@gmail.com",
+      "password": "abc"
+    },
+    {
+      "id": 2,
+      "name": "def",
+      "email": "def@gmail.com",
+      "password": "def"
+    },
+    {
+      "id": 3,
+      "name": "pqr",
+      "email": "pqr@gmail.com",
+      "password": "pqr"
+    }
+    
+  ],
+  "admin": [
+    {
+      "id": 1,
+      "name": "abc",
+      "email": "admin@gmail.com",
+      "password": "admin"
+    }
+  ]
+}

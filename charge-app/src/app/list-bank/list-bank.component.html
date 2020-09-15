@@ -1,0 +1,29 @@
+<br>
+<br>
+<br>
+
+<div class="container">
+<table class="table table-striped table-bordered table-md table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Category</th>
+            <th scope="col">Rule Name</th>
+            <th scope="col">Conditions</th>
+            <th scope="col">Fees</th>
+            <th scope="col">Code</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let rule of collection">
+            <th>{{rule.id}}</th>
+            <td>{{rule.category}}</td>
+            <td>{{rule.ruleName}}</td>
+            <td>{{rule.conditions}}</td>
+            <td>{{rule.fees}}</td>
+            <td>{{rule.code}}</td>
+        </tr>
+
+    </tbody>
+</table>
+</div>
