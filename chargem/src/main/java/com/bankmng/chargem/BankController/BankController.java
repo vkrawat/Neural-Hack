@@ -3,9 +3,12 @@ package com.bankmng.chargem.BankController;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,8 +31,19 @@ public class BankController {
 	public List<BankEmployeeEntity> getAllEmployees(){
 		return empser.findAll();	
 	}
+
+	@GetMapping("/userprofile")
+	public BankEmployeeEntity getUser(HttpServletRequest req){
+		if(req.getSession().getAttribute("user")==null)
+			return null;
+		else
+			return (BankEmployeeEntity)req.getSession().getAttribute("user");
+	}
+
+	
 	@PostMapping("/login")
-	public ResponseEntity<BankEmployeeEntity> login(@RequestBody LoginBankEmployee login)
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity<BankEmployeeEntity> loginUser(@RequestBody LoginBankEmployee login,HttpServletRequest req)
 	{
 		System.out.println("in login..\n");
 		System.out.println(empser);
@@ -43,9 +57,9 @@ public class BankController {
         	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND) ;
 		      
         }
-       
+        req.getSession().setAttribute("user",user);
+        System.out.println("user created");
         return new ResponseEntity<BankEmployeeEntity>(user,HttpStatus.FOUND) ;
-
 
 	 //   	return impl.loginEmployee(loginemp);
 	}
