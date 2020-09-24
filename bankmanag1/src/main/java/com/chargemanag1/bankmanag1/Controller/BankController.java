@@ -27,6 +27,48 @@ public class BankController {
 	@Autowired
 	private BankEmployeeRepository empser;
 
+
+	@PostMapping("/login")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity<BankEmployeeEntity> loginUser(@RequestBody(required=false) LoginBankEmployee login,HttpServletRequest req)
+	{
+		System.out.println("in login..\n");
+		//System.out.println(empser);
+		//System.out.println();
+		if(login==null)
+			return null;
+		System.out.println(login.getPassword()+" pp"+login.getEmail()+" inn");
+        BankEmployeeEntity user = empser.findByUserid(login.getEmail());
+        if(user == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build() ;
+        }
+        if(!user.getPassword().equals(login.getPassword())){
+        	return ResponseEntity.status(HttpStatus.NOT_FOUND).build() ;
+        }
+        req.getSession().setAttribute("user",user);
+        System.out.println("user created");
+       // user=null;
+        //new Respons
+        return ResponseEntity.ok(user) ;
+
+	 //   	return impl.loginEmployee(loginemp);
+	}
+
+	@GetMapping("/logout")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity logout(HttpServletRequest req)
+	{
+		System.out.println(" logging out");
+		if(req.getSession().getAttribute("user")==null)
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		else
+		{
+			System.out.println(" logged out");
+			req.getSession().invalidate();
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+	}
+
 	@GetMapping("/employees")
 	public List<BankEmployeeEntity> getAllEmployees(){
 		return empser.findAll();	
@@ -40,30 +82,8 @@ public class BankController {
 			return (BankEmployeeEntity)req.getSession().getAttribute("user");
 	}
 
-	
-	@PostMapping("/login")
-	@CrossOrigin(origins = "http://localhost:4200")
-	public ResponseEntity<BankEmployeeEntity> loginUser(@RequestBody LoginBankEmployee login,HttpServletRequest req)
-	{
-		System.out.println("in login..\n");
-		System.out.println(empser);
-		System.out.println(login.getPassword()+" "+login.getUserid());
-        BankEmployeeEntity user = empser.findByUserid(login.getUserid());
-        if(user == null) {
 
-	        return new ResponseEntity<>(null,HttpStatus.NOT_FOUND) ;
-        }
-        if(!user.getPassword().equals(login.getPassword())){
-        	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND) ;
-		      
-        }
-        req.getSession().setAttribute("user",user);
-        System.out.println("user created");
-        return new ResponseEntity<BankEmployeeEntity>(user,HttpStatus.FOUND) ;
-
-	 //   	return impl.loginEmployee(loginemp);
-	}
-	@PostMapping("/saveEmployee")
+		@PostMapping("/saveEmployee")
 	public BankEmployeeEntity saveEmployee(@RequestBody BankEmployeeEntity newEmployee) 
 	{
 		empser.save(newEmployee);
@@ -74,6 +94,12 @@ public class BankController {
 	@GetMapping("/employee/{id}")
 	public Optional<BankEmployeeEntity> getEmployee(@PathVariable String id) {
 		return empser.findById(id);
+	}
+	@GetMapping("/users")
+	public Optional<BankEmployeeEntity> users() {
+		System.out.println("in mapping.....");
+		//return empser.findById(id);
+		return null;
 	}
 	
 	@DeleteMapping("/delemployee/{id}")

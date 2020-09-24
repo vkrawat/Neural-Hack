@@ -20,7 +20,7 @@ public class BankEmployeeServiceImpl implements BankEmployeeService{
 	public ResponseEntity<BankEmployeeEntity> loginEmployee(LoginBankEmployee login) {
 		 //public ApiResponse login(LoginDto loginDto) {
 		System.out.println(emp);
-		        BankEmployeeEntity user = emp.findByUserid(login.getUserid());
+		        BankEmployeeEntity user = emp.findByUserid(login.getEmail());
 		        if(user == null) {
 
 			        return new ResponseEntity<>(null,HttpStatus.NOT_FOUND) ;

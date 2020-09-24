@@ -1,13 +1,13 @@
 package com.chargemanag1.bankmanag1;
 
 public class LoginBankEmployee {
-	String userid;
+	String email;
 	String password;
-	public String getUserid() {
-		return userid;
+	public String getEmail() {
+		return email;
 	}
 	public void setUserid(String userid) {
-		this.userid = userid;
+		this.email = userid;
 	}
 	public String getPassword() {
 		return password;
