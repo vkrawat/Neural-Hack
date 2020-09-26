@@ -1,0 +1,69 @@
+package rules
+
+import com.virtusa.model.Charge_Managment
+
+rule "ATM WithDraw From Parent Bank"
+
+	when 
+			c1 : Charge_Managment(operation_type=="Withdrawl",bankATM=="Parent",transfer_count>=20,no_of_days<=30)
+    then
+    		c1.setTax(0.02);
+    		c1.setAmount(c1.getAmount()*c1.getTax());
+    		System.out.println("The Account Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" charged with tax for Withdraw from parent bank "+c1.getTax()+" Final Amount withdrawed "+c1.getAmount());
+    end
+
+rule "ATM WithDraw From Other Bank"
+
+	when
+			c1 : Charge_Managment(operation_type=="Withdrawl",bankATM=="Other",transfer_count>=5,no_of_days<=30)
+	then
+			c1.setTax(0.1);
+    		c1.setAmount(c1.getAmount()*c1.getTax());
+    		System.out.println("The Account Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" charged with tax for Withdraw from Other bank "+c1.getTax()+" Final Amount withdrawed "+c1.getAmount());
+	end
+	
+
+rule "Statment Print Copy"
+
+	when
+			c1:Charge_Managment(operation_type=="statmentprint")
+	then
+			c1.setTax(50.0);
+			System.out.println("The Account Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" Amount paid for Statment print is : "+ c1.getTax());
+	end
+
+rule "Duplicate Debit Card"
+
+	when
+			c1:Charge_Managment(operation_type=="DuplicateDebitCard")
+	then
+			c1.setTax(150.0);
+			System.out.println("The Account Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" Amount paid for Duplicate Debit Card is : "+ c1.getTax());
+	end
+	
+rule "Duplicate Credit Card"
+
+	when
+			c1:Charge_Managment(operation_type=="DuplicateCreditCard")
+	then
+			c1.setTax(450.0);
+			System.out.println("The Account Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" Amount paid for DuplicateCreditCard is : "+ c1.getTax());
+	end
+
+rule "Monthly charges savings"
+
+	when
+			c1:Charge_Managment(account_type=="savings",((no_of_days%30)==0))
+	then
+			c1.setTax(25.0);
+			System.out.println("The Account Holder with Accno "+c1.getAcc_no()+" "+c1.getAcc_name()+" "+c1.getAccount_type()+" account charged with tax of "+c1.getTax());
+	end
+
+rule "Monthly charges current"
+
+	when
+			c1:Charge_Managment(account_type=="current",((no_of_days%60)==0))
+	then
+			c1.setTax(0.05);
+			System.out.println("The Account Holder with Accno "+c1.getAcc_no()+" "+c1.getAcc_name()+" "+c1.getAccount_type()+" account charged with tax of "+c1.getTax());
+	end

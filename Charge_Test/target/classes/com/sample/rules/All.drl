@@ -1,0 +1,40 @@
+package rules
+
+import com.virtusa.model.Charge_Managment
+
+rule "Fund Transfer From Bank Condition 1"
+
+	when
+			c1:Charge_Managment(operation_type=="FundTransfer",transfer_count<10,no_of_days<=30)
+	then
+			c1.setTax(0.0); 
+			System.out.println("The Acoount Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" Fund Transfer Charged Amount for "+c1.getTransfer_count() +" Transfers: "+c1.getTax());
+	end
+
+rule "Fund Transfer From Bank Condition 2"
+
+	when
+			c1:Charge_Managment(operation_type=="FundTransfer",transfer_count>=11,transfer_count<30,no_of_days<=30)
+	then
+			c1.setTax(100.0);
+			System.out.println("The Acoount Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" Fund Transfer Charged Amount for "+c1.getTransfer_count() +" Transfers: "+c1.getTax());
+	end
+
+rule "Fund Transfer From Bank condition 3"
+
+	when
+			c1:Charge_Managment(operation_type=="FundTransfer",transfer_count>=31,transfer_count<50,no_of_days<=30)
+	then
+			c1.setTax(150.0);
+			System.out.println("The Acoount Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" Fund Transfer Charged Amount for "+c1.getTransfer_count() +" Transfers: "+c1.getTax());
+	end
+	
+
+rule "Fund Transfer with condition 4"
+
+	when
+			c1:Charge_Managment(operation_type=="FundTransfer",transfer_count>50)
+	then
+			c1.setTax(300.0);
+			System.out.println("The Acoount Holder "+c1.getAcc_no()+" "+c1.getAcc_name()+" Fund Transfer Charged Amount for "+c1.getTransfer_count() +" Transfers: "+c1.getTax());
+	end
