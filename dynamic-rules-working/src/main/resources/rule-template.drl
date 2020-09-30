@@ -1,0 +1,18 @@
+template header
+
+rule
+eventType
+
+package org.ossandme;
+global com.virtusa.main.AlertDecision alertDecision;
+
+template "alert"
+
+rule "alert_@{row.rowNumber}"
+when
+    @{eventType}(@{rule})
+then
+    alertDecision.setDoAlert(Boolean.TRUE);
+end
+
+end template
