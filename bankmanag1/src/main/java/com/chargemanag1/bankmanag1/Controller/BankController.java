@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,12 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chargemanag1.bankmanag1.LoginBankEmployee;
+import com.chargemanag1.bankmanag1.Entity.BankEmployeeEntity;
 import com.chargemanag1.bankmanag1.Repository.BankEmployeeRepository;
 import com.chargemanag1.bankmanag1.Service.BankEmployeeServiceImpl;
-import com.chargemanag1.bankmanag1.Entity.BankEmployeeEntity;
 
 @RestController
 public class BankController {
@@ -27,17 +29,12 @@ public class BankController {
 	@Autowired
 	private BankEmployeeRepository empser;
 
-
 	@PostMapping("/login")
 	@CrossOrigin(origins = "http://localhost:4200")
 	public ResponseEntity<BankEmployeeEntity> loginUser(@RequestBody(required=false) LoginBankEmployee login,HttpServletRequest req)
 	{
-		System.out.println("in login..\n");
-		//System.out.println(empser);
-		//System.out.println();
-		if(login==null)
-			return null;
-		System.out.println(login.getPassword()+" pp"+login.getEmail()+" inn");
+		System.out.println("in login method..");
+		System.out.println(login.getPassword()+" "+login.getEmail()+" ");
         BankEmployeeEntity user = empser.findByUserid(login.getEmail());
         if(user == null) {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build() ;
@@ -46,12 +43,11 @@ public class BankController {
         	return ResponseEntity.status(HttpStatus.NOT_FOUND).build() ;
         }
         req.getSession().setAttribute("user",user);
-        System.out.println("user created");
-       // user=null;
-        //new Respons
+        HttpSession ssn=req.getSession();
+        
+        //System.out.println("user created");
+        System.out.println("user--"+user.getRole());
         return ResponseEntity.ok(user) ;
-
-	 //   	return impl.loginEmployee(loginemp);
 	}
 
 	@GetMapping("/logout")
@@ -69,21 +65,72 @@ public class BankController {
 		}
 	}
 
+	
+	@GetMapping("/approve")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity approveRule(@RequestParam String hd,HttpServletRequest req){
+		System.out.println(" approveing ");
+		BankEmployeeEntity user= (BankEmployeeEntity)req.getSession().getAttribute("user");
+		System.out.println("user "+user);
+		// check for logged in / valid user
+		if(user==null || !user.getRole().equalsIgnoreCase("approver"))
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		//valid
+		// add to rule engine
+		// return list of all rules
+		System.out.println(" empty ");
+		return 	ResponseEntity.ok().build();
+	}
+
+	
+	@DeleteMapping("/reject")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity rejectRule(@RequestParam String hd,HttpServletRequest req){
+		System.out.println(" reject ");
+		BankEmployeeEntity user= (BankEmployeeEntity)req.getSession().getAttribute("user");
+		System.out.println("user"+user);
+		// check for logged in / valid user
+		if(user==null || !user.getRole().equalsIgnoreCase("approver"))
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		//valid
+		// remove from temporary db
+		// return list of all pending rules 
+		return 	ResponseEntity.of(null);
+	}
+	
+	@DeleteMapping("/delete")
+	@CrossOrigin(origins = "http://localhost:4200")
+	  public ResponseEntity deleteRule(@RequestParam String hd,HttpServletRequest req) {
+		System.out.println(" in delete ");
+		if(req.getSession().getAttribute("user")==null)
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    return ResponseEntity.status(HttpStatus.OK).build();
+	   
+	  }
+	
+	
+	@GetMapping("/update")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public List<BankEmployeeEntity> update(@RequestParam String hd){
+		System.out.println(" updated called ");
+		return empser.findAll();	
+	}
+
 	@GetMapping("/employees")
 	public List<BankEmployeeEntity> getAllEmployees(){
 		return empser.findAll();	
 	}
 
 	@GetMapping("/userprofile")
-	public BankEmployeeEntity getUser(HttpServletRequest req){
+	public ResponseEntity getUser(HttpServletRequest req){
 		if(req.getSession().getAttribute("user")==null)
-			return null;
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		else
-			return (BankEmployeeEntity)req.getSession().getAttribute("user");
+			return ResponseEntity.ok((BankEmployeeEntity)req.getSession().getAttribute("user"));
 	}
 
 
-		@PostMapping("/saveEmployee")
+	@PostMapping("/saveEmployee")
 	public BankEmployeeEntity saveEmployee(@RequestBody BankEmployeeEntity newEmployee) 
 	{
 		empser.save(newEmployee);
@@ -106,5 +153,13 @@ public class BankController {
 	  public void deleteEmployee(@PathVariable String id) {
 	    empser.deleteById(id);
 	  }
-	
+
+	@GetMapping("/list")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity loginList(HttpServletRequest req)
+	{
+        System.out.println("lists ");
+        List<BankEmployeeEntity> list= empser.findAll();
+        return ResponseEntity.ok(list);
+	}
 }
