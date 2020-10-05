@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,14 +18,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.chargemanag1.bankmanag1.JwtRequestFilter;
+import com.chargemanag1.bankmanag1.JwtResponse;
+import com.chargemanag1.bankmanag1.JwtTokenUtil;
+import com.chargemanag1.bankmanag1.LoginBankEmployee;
 import com.chargemanag1.bankmanag1.Entity.BankEmployeeEntity;
 import com.chargemanag1.bankmanag1.Entity.Rules;
 import com.chargemanag1.bankmanag1.RuleEngine.Program;
 import com.chargemanag1.bankmanag1.Service.BankEmployeeServiceImpl;
 import com.chargemanag1.bankmanag1.Service.RulesService;
-
 @RestController
-@CrossOrigin
+//@CrossOrigin
 public class BankController {
 	//BankEmployeeServiceImpl impl=new BankEmployeeServiceImpl();
 	@Autowired
@@ -32,40 +36,37 @@ public class BankController {
 
 	@Autowired
 	private RulesService ruler;
-
+	
+	JwtRequestFilter filter= new JwtRequestFilter();
 	//@Autowired
 	//private AuthenticationManager authenticationManager;
-
-	//@Autowired
-	//private JwtTokenUtil jwtTokenUtil;
-/*
-
-	private void authenticate(String username, String password) throws Exception {
-		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		} catch (DisabledException e) {
-			System.out.println("disbled ???"+e.getMessage());
-			throw new Exception("USER_DISABLED", e);
-		} catch (BadCredentialsException e) {
-			System.out.println("invalid +e/"+e.getMessage());
-			throw new Exception("INVALID_CREDENTIALS", e);
-		}
-	}
-
+		
 	@PostMapping("/login")
 	@CrossOrigin(origins = "http://localhost:4200")
 	public ResponseEntity<JwtResponse> loginUser(@RequestBody(required=false) LoginBankEmployee login,HttpServletRequest req,
 			HttpServletResponse res)throws Exception
 	{
+	    JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
 		System.out.println("in login method..");
-		authenticate(login.getEmail(), login.getPassword());
-		System.out.println();
-		final UserDetails userDetails = empser.loadUserByUsername(login.getEmail());
+		ResponseEntity<BankEmployeeEntity> employee=empser.loginEmployee(login);
+		System.out.println(employee.getBody());
+		BankEmployeeEntity user= employee.getBody();
+		if(user==null)
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		else
+		{
+		     JwtTokenUtil jwtToken= new JwtTokenUtil();
+		     String token= jwtToken.generateToken(user);
+		     return ResponseEntity.ok(new JwtResponse(token,login.getEmail(),user.getRole()));
+		}
+		/*final UserDetails userDetails = empser.loadUserByUsername(login.getEmail());
 		final String token = jwtTokenUtil.generateToken(userDetails);
 		return ResponseEntity.ok(new JwtResponse(token,userDetails.getPassword(),login.getEmail()));
         //return response;
+         * 
+         */
 	}
-*/
+
 	@GetMapping("/api/getcharge")
 	@CrossOrigin(origins = "http://localhost:4200")
 	public void charge() throws Exception
@@ -74,13 +75,14 @@ public class BankController {
 		p.mainProgram();
 	}
 	
+	/*
 	@GetMapping("/logout")
 	@CrossOrigin(origins = "http://localhost:4200")
 	public ResponseEntity logout(HttpServletRequest req)
 	{
 		System.out.println(" logging out");
 		return empser.logout(req);
-	}
+	}*/
 
 	// done
 	@GetMapping("/approve")
@@ -135,10 +137,23 @@ public class BankController {
 	// done
 	@GetMapping("/rules")
 	@CrossOrigin(origins = "http://localhost:4200")
-	  public ResponseEntity allRules(HttpServletRequest req) 
+	  public ResponseEntity allRules(HttpServletRequest req, HttpServletResponse res) 
 	{
+		try {
 		System.out.println(" rules ");
+		String username=filter.doFilterInternal(req, res);
+		//System.out.println(username);
+		if(username==null)
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		//String username= filter.
 		return ResponseEntity.ok(ruler.allRules(true));
+		}
+		catch (Exception e) {
+			//System.out.println("smthng ");
+			//System.out.println(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			// TODO: handle exception
+		}
 	 }
 	
 	// done
@@ -182,10 +197,11 @@ public class BankController {
 	@PostMapping("/saveEmployee")
 	public BankEmployeeEntity saveEmployee(@RequestBody BankEmployeeEntity newEmployee) 
 	{
-		//empser.save(newEmployee);
+		System.out.println("save called");
+		return empser.save(newEmployee);
 	    //	BankEmployeeEntity employee=new BankEmployeeEntity();
 		//return empser.saveEmp(newEmployee);
-		return new BankEmployeeEntity();
+		//return new BankEmployeeEntity();
 	}
 	
 	@GetMapping("/employee/{id}")

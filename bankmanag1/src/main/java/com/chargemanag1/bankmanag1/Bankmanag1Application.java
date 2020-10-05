@@ -11,23 +11,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 */
 import org.springframework.util.AntPathMatcher;
 
-/*
-@Configuration
-class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-    http.csrf().disable()
-    .formLogin()
-    .loginPage("/login").permitAll()
-    .and()
-    .logout().invalidateHttpSession(true).clearAuthentication(true)
-    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-    .logoutSuccessUrl("/logout-success").permitAll();
-        httpSecurity.authorizeRequests().antMatchers("/**").permitAll().anyRequest().authenticated();
-}
-    }
-*/
 //(exclude =SecurityAutoConfiguration.class)
 
 @ComponentScan(basePackages = {"com.chargemanag1.bankmanag1.*"})

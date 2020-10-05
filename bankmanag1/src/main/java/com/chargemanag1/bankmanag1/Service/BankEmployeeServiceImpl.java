@@ -1,8 +1,4 @@
 package com.chargemanag1.bankmanag1.Service;
-
-
-import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +9,40 @@ import org.springframework.stereotype.Service;
 import com.chargemanag1.bankmanag1.LoginBankEmployee;
 import com.chargemanag1.bankmanag1.Entity.BankEmployeeEntity;
 import com.chargemanag1.bankmanag1.Repository.BankEmployeeRepository;
-
-
 @Service
 public class BankEmployeeServiceImpl implements BankEmployeeService{
-
 	@Autowired
 	private BankEmployeeRepository emp;
-
+		//@Autowired
+		//private PasswordEncoder bcryptEncoder;
+	/*	@Override
+		public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+			BankEmployeeEntity user = emp.findByUserid(username);
+			if (user == null) {
+				throw new UsernameNotFoundException("User not found with username: " + username);
+			}
+			return new org.springframework.security.core.userdetails.User(user.getUserid(), user.getRole(),
+					new ArrayList<>());
+			/*if ("javainuse".equals(username)) {
+				return new User("javainuse", "$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6",
+						new ArrayList<>());
+			} else {
+				throw new UsernameNotFoundException("User not found with username: " + username);
+		}	}*/
+		
+		
+		public BankEmployeeEntity finduser(String username)
+		{
+			return emp.findByUserid(username);
+		}
+		
+		public BankEmployeeEntity save(BankEmployeeEntity user) {
+		//	PasswordEncoder bcryptEncoder = new BCryptPasswordEncoder();
+			//user.setPassword(bcryptEncoder.encode(user.getPassword()));
+			System.out.println("saving...");
+			return emp.save(user);
+		}
+		
 //	@Autowired
 	//private PasswordEncoder passwordEncoder;
  /*
