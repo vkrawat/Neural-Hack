@@ -1,4 +1,6 @@
 package com.chargemanag1.bankmanag1.Service;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,11 @@ public class BankEmployeeServiceImpl implements BankEmployeeService{
 		      return new ResponseEntity<BankEmployeeEntity>(user,HttpStatus.FOUND) ;
 
 		    }
+	
+	public List<BankEmployeeEntity> findAll()
+	{
+		return emp.findAll();
+	}
 	
 public ResponseEntity logout(HttpServletRequest req)
 {

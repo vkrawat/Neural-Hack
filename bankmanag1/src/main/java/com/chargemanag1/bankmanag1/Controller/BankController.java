@@ -59,12 +59,6 @@ public class BankController {
 		     String token= jwtToken.generateToken(user);
 		     return ResponseEntity.ok(new JwtResponse(token,login.getEmail(),user.getRole()));
 		}
-		/*final UserDetails userDetails = empser.loadUserByUsername(login.getEmail());
-		final String token = jwtTokenUtil.generateToken(userDetails);
-		return ResponseEntity.ok(new JwtResponse(token,userDetails.getPassword(),login.getEmail()));
-        //return response;
-         * 
-         */
 	}
 
 	@GetMapping("/api/getcharge")
@@ -72,7 +66,8 @@ public class BankController {
 	public void charge() throws Exception
 	{
 		Program p=new Program();
-		p.mainProgram();
+		//p.mainProgram();
+		
 	}
 	
 	/*
@@ -87,40 +82,75 @@ public class BankController {
 	// done
 	@GetMapping("/approve")
 	@CrossOrigin(origins = "http://localhost:4200")
-	public ResponseEntity approveRule(@RequestParam String hd, HttpServletRequest req)
+	public ResponseEntity approveRule(@RequestParam String paramname, HttpServletRequest req)
 	{
 		System.out.println(" approving code ");
-		long code=Long.valueOf(hd);
-		if(ruler.approveRule(code))
-			return ResponseEntity.ok().build();
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		try
+		  {
+			String role = filter.doFilterInternal(req);
+			if(role==null )
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			if( "approver".equals(role)==false)
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			long code=Long.valueOf(paramname);
+			if(ruler.approveRule(code))
+				return ResponseEntity.ok().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		  }
+			catch (Exception e) {
+				System.out.println("exception: "+e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			}
 	}
 
 	// done
 	@DeleteMapping("/reject")
 	@CrossOrigin(origins = "http://localhost:4200")
-	public ResponseEntity rejectRule(@RequestParam String hd,HttpServletRequest req)
+	public ResponseEntity rejectRule(@RequestParam String paramname,HttpServletRequest req)
 	{
 		System.out.println(" reject code ");
-		long code=Long.valueOf(hd);
-		if(ruler.rejectRule(code))
-			return ResponseEntity.ok().build();
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		try
+		  {
+			String role = filter.doFilterInternal(req);
+			if(role==null )
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			if( "approver".equals(role)==false)
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			long code=Long.valueOf(paramname);
+			if(ruler.rejectRule(code))
+				return ResponseEntity.ok().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		  }
+			catch (Exception e) {
+				System.out.println("exception: "+e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			}
 	}
 	
 	// done
 	@DeleteMapping("/delete")
 	@CrossOrigin(origins = "http://localhost:4200")
-	  public ResponseEntity deleteRule(@RequestParam String hd,HttpServletRequest req) 
+	  public ResponseEntity deleteRule(@RequestParam String paramname,HttpServletRequest req) 
 	{
 		// chk for session
 		System.out.println(" calling method to delete rule..");
-		System.out.println(hd);
-		long code=Long.valueOf(hd);
-		System.out.println(hd);
-		if(ruler.deleteRule(code))
-			return ResponseEntity.ok().build();
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		try
+		  {
+			String role = filter.doFilterInternal(req);
+			if(role==null )
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			if( "admin".equals(role)==false)
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			long code=Long.valueOf(paramname);
+			if(ruler.deleteRule(code))
+				return ResponseEntity.ok().build();
+			System.out.println("ops");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		  }
+			catch (Exception e) {
+				System.out.println("exception: "+e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			}
 	  }
 	
 	// done
@@ -129,60 +159,113 @@ public class BankController {
 	public ResponseEntity<Rules> addRule(@RequestBody(required=false) Rules rule,HttpServletRequest req)
 	{
 		System.out.println(" insert rule..");
+		try 
+		{
+			String role = filter.doFilterInternal(req);
+		if(role==null )
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		if( "creator".equals(role)==false)
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		if(ruler.addRule(rule))
 			return ResponseEntity.ok().build();
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+		catch (Exception e) {
+			System.out.println("exception: "+e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
-	
+
+	@PostMapping("/updaterule")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity<Rules> updateRuleData(@RequestBody(required=false) Rules rule,HttpServletRequest req)
+	{
+		System.out.println(" updating rule..");
+		//System.out.println(rule);
+		//System.out.println(rule.getCategory());
+		try 
+		{
+			
+			String role = filter.doFilterInternal(req);
+			if(role==null )
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			if( "admin".equals(role)==false)
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			if(ruler.updateRuleData(rule))
+			return ResponseEntity.ok().build();
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+		catch (Exception e) {
+			System.out.println("exception: "+e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 	// done
-	@GetMapping("/rules")
+	@GetMapping("/list")
 	@CrossOrigin(origins = "http://localhost:4200")
 	  public ResponseEntity allRules(HttpServletRequest req, HttpServletResponse res) 
 	{
-		try {
+		try 
+		{
 		System.out.println(" rules ");
-		String username=filter.doFilterInternal(req, res);
-		//System.out.println(username);
-		if(username==null)
+		if(filter.doFilterInternal(req)==null)
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		//String username= filter.
 		return ResponseEntity.ok(ruler.allRules(true));
 		}
 		catch (Exception e) {
-			//System.out.println("smthng ");
-			//System.out.println(e.getMessage());
+			System.out.println("exception: "+e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-			// TODO: handle exception
 		}
 	 }
 	
 	// done
-	@GetMapping("/pendingrules")
+	@GetMapping("/pendinglist")
 	@CrossOrigin(origins = "http://localhost:4200")
 	  public ResponseEntity pendingRules(HttpServletRequest req) 
 	{
-		  System.out.println(" pending rules ");
-		  return ResponseEntity.ok(ruler.allRules(false));
+		try
+		  {
+			System.out.println(" pending rules ");
+			if(filter.doFilterInternal(req)==null)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			return ResponseEntity.ok(ruler.allRules(false));
+		  }
+			catch (Exception e) {
+				System.out.println("exception: "+e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			}
 	  }
 	
 	
 	// done -- if code exists 
 	@GetMapping("/update")
 	@CrossOrigin(origins = "http://localhost:4200")
-	public ResponseEntity<Rules> update(@RequestParam String hd){
-		System.out.println(" updated called ");
-		long code=Long.valueOf(hd);
-		Rules rule=ruler.updateCodeExists(code);
-		if(rule==null)
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		return ResponseEntity.ok(rule); 
+	public ResponseEntity<Rules> update(@RequestParam String paramname, HttpServletRequest req){
+		try
+		  {
+			String role = filter.doFilterInternal(req);
+			if(role==null )
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			if( "admin".equals(role))
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			System.out.println(" updated called ");
+			long code=Long.valueOf(paramname);
+			Rules rule=ruler.updateCodeExists(code);
+			if(rule==null)
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			return ResponseEntity.ok(rule); 
+		  }
+			catch (Exception e) {
+				System.out.println("exception: "+e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			}
 		//return empser.findAll();	
 	}
 
 	@GetMapping("/employees")
 	public List<BankEmployeeEntity> getAllEmployees(){
-		return null;
-		//return empser.findAll();	
+		//return null;
+		return empser.findAll();	
 	}
 
 	@GetMapping("/userprofile")
@@ -190,7 +273,7 @@ public class BankController {
 		if(req.getSession().getAttribute("user")==null)
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		else
-			return ResponseEntity.ok((BankEmployeeEntity)req.getSession().getAttribute("user"));
+			return ResponseEntity.ok().build();
 	}
 
 
@@ -199,9 +282,6 @@ public class BankController {
 	{
 		System.out.println("save called");
 		return empser.save(newEmployee);
-	    //	BankEmployeeEntity employee=new BankEmployeeEntity();
-		//return empser.saveEmp(newEmployee);
-		//return new BankEmployeeEntity();
 	}
 	
 	@GetMapping("/employee/{id}")
@@ -221,14 +301,6 @@ public class BankController {
 	    //empser.deleteById(id);
 	  }
 
-	@GetMapping("/list")
-	@CrossOrigin(origins = "http://localhost:4200")
-	public ResponseEntity loginList(HttpServletRequest req)
-	{
-        System.out.println("lists ");
-        //List<BankEmployeeEntity> list= empser.findAll();
-        return null;
-       // return ResponseEntity.ok(list);
-	}
+	
 	
 }
