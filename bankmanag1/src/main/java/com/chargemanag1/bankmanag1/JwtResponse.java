@@ -8,6 +8,7 @@ public class JwtResponse implements Serializable {
 	private  String jwttoken;
 	private String userid;
 	private  String role;
+	
 	public String getJwttoken() {
 		return jwttoken;
 	}
@@ -32,6 +33,4 @@ public class JwtResponse implements Serializable {
 		this.userid = userid;
 		this.role = role;
 	}
-	
-	
 }
